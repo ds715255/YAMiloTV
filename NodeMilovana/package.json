@@ -1,0 +1,25 @@
+{
+  "name": "node-milovana",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./runapp.js"
+  },
+  "description": "NodeMilovana",
+  "author": {
+    "name": "astaria"
+  },
+  "main": "app.js",
+  "dependencies": {
+    "debug": "^2.2.0",
+    "express": "^4.14.0",
+    "pug": "^2.0.0-beta6",
+    "request": "^2.79.0"
+  },
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-contrib-cssmin": "^1.0.2",
+    "grunt-contrib-uglify": "^2.0.0",
+    "uglify-js": "github:mishoo/UglifyJS2#harmony"
+  }
+}

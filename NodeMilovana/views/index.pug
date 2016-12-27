@@ -1,0 +1,25 @@
+﻿extends layout
+
+block head
+  script(src='/javascripts/main.min.js')
+
+block content
+  div(class="introwrapper")
+    div(class="block2")
+      h1 Welcome to Yet Another Milovana Tease Viewer, or YAMiloTV!
+    div(class="block1")
+      p This is a viewer for <a href="https://www.milovana.com" target="_blank">Milovana</a> Flash Webteases using modern HTML5 technologies. It's free and open source.
+      p The viewer is based on the original flash code and should be able to process any flash tease you throw at it. <span class="ios">However, there are some limitations regarding audio on mobile Apple devices. To 
+        |play audio you need to add this web site to Home Screen.</span>
+      h2 Quick start
+      ol(class="rounded-list")
+        li <p>For tease selection visit <a href="https://www.milovana.com/webteases/" target="_blank">https://www.milovana.com/webteases/</a></p>
+        li <p>Paste the flash tease link of choice here:<br /><input type="text" id="teaseurltb" style="width:100%;margin:5px 0" /></p>
+        li <p><button id="addtease" disabled>Add the tease</button> to your tease list.</p>
+    div(class="block2", style="min-height:300px")
+      img(src="images/girl.png", align="left")
+      div(style="margin-left:160px;display:block")
+          h2 My Tease List
+          table(id="teases")
+    div(class="block1")
+      p Find the source code on <a href="https://github.com/ds715255/YAMiloTV">GitHub</a>.

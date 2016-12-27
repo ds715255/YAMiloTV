@@ -1,0 +1,16 @@
+﻿extends layout
+
+block head
+  link(rel='stylesheet', href='/stylesheets/tease.min.css')
+  script(src='/javascripts/flashtease.min.js')
+
+block content  
+    div(class='full-screen')    
+      div(id='tease')
+      div(style='position:absolute;right:0;top:0') 
+        button(id='exit',title='Exit tease') X
+      div(id='loading')
+        p Loading
+      div(id='rating')        
+        
+          

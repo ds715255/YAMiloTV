@@ -1,0 +1,128 @@
+﻿html, body {
+    
+}
+
+body {
+    padding: 0;
+    margin: 0;
+    font: 13px "Lucida Grande", Helvetica, Arial, sans-serif;
+    background: black;
+    color: #dcdcdc;
+}
+
+a {
+    color: #FFF;
+}
+
+h1 {
+    font-size: 130%;
+}
+
+.introwrapper {
+    margin: 0pt auto;
+    position: relative;
+    width: 80%;
+    max-width:600pt;
+}
+
+@media screen and (max-width: 800px) {
+    .introwrapper {
+        width:100%;
+    }
+}
+
+.block2 {
+    padding: 10pt 20pt;
+    background-color: #B85959;
+}
+
+.block1 {
+    padding: 10pt 20pt;
+    background-color: #E19595;
+    color: #222222;
+}
+
+ol {
+    counter-reset: li; /* Initiate a counter */
+    list-style: none; /* Remove default numbering */
+    *list-style: decimal; /* Keep using default numbering for IE6/7 */
+    padding: 0;
+    margin-bottom: 4em;
+}
+
+.rounded-list p {
+    position: relative;
+    display: block;
+    padding: .4em 2em .4em 2em;
+    *padding: .4em;
+    margin: .5em 0;
+    background: #B85959;
+    color: white;
+    text-decoration: none;
+    border-radius: .3em;
+    transition: all .3s ease-out;
+}
+
+
+.rounded-list p:before {
+    content: counter(li);
+    counter-increment: li;
+    position: absolute;
+    left: -1.3em;
+    top: 50%;
+    margin-top: -1.3em;
+    background: #B85959;
+    height: 2em;
+    width: 2em;
+    line-height: 2em;
+    border: .3em solid #fff;
+    text-align: center;
+    font-weight: bold;
+    border-radius: 2em;
+    transition: all .3s ease-out;
+}
+
+#teases {
+    width: 100%;
+    empty-cells: show;
+    border-spacing: 0;
+    padding: 0;
+    table-layout: fixed;
+    color: #222222;
+}
+
+
+
+#teases tr {
+    background-color: #E19595;
+    vertical-align: top;    
+}
+
+    #teases td {
+        border-bottom: 1px solid #B85959;
+    }
+
+#teases h3 {
+    margin:5px 0;
+}
+
+#teases tr>td:first-of-type{
+    width:170px;
+    text-align:center;
+}
+
+#teases tr > td:nth-of-type(3) {
+    width: 100px;
+    padding:5px;
+}
+
+    #teases tr > td:nth-of-type(3) button {
+        width:100%;        
+        margin-bottom:5px;
+        min-height:30px;
+    }
+    
+    
+    #teases img {
+        margin: 5px;
+    }

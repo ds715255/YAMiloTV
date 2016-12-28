@@ -1,5 +1,5 @@
 ﻿var teaseManager: TeaseManager;
-
+var settingsManager: SettingsManager;
 
 class Tease {
     private _id: number;
@@ -53,7 +53,7 @@ class Tease {
         target.append(node);
         var buttons = node.find("button");
         $(buttons[0]).click(() => {
-            location.href = `tease?id=${this._id}`;
+            location.href = `tease?id=${this._id}&skin=${settingsManager.get('skin')}`;
         });
         $(buttons[1]).css("display", "none"); // not supported (yet?)
         $(buttons[2]).click(() => {
@@ -139,6 +139,38 @@ class TeaseManager {
     }
 }
 
+class SettingsManager {
+
+    registerSwitchGroup(inputs: JQuery, name: string) {
+        var self = this;
+        inputs.change(function (e) {
+            self.saveSetting(name, $(e.target).val());
+        });
+
+        var defaultInput = inputs.filter("input[checked='checked']");
+        defaultInput = defaultInput.length == 0 ? $(inputs[0]) : defaultInput;
+
+        var storedValue = this.loadSetting(name, defaultInput.val());
+        inputs.filter(`input[value='${storedValue}']`).click();
+    }
+
+    get(name: string): any {
+        return this.loadSetting(name, null);
+    }
+
+    private saveSetting(name: string, value: any) {
+        window.localStorage.setItem(`setting-${name}`, JSON.stringify(value));
+    }
+
+    private loadSetting(name: string, defaultValue: any): any {
+        var result = window.localStorage.getItem(`setting-${name}`);
+        if (result == null) {
+            return defaultValue;
+        }
+        return JSON.parse(result);
+    }
+}
+
 function checkAddTease() {
     var value: string = $("#teaseurltb").val();
     var id = Tease.getIdFromUrl(value);
@@ -154,6 +186,8 @@ $(document).ready(function () {
     var iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream; if (!iOS) $('.ios').remove();
 
     teaseManager = new TeaseManager($("#teases"));
+    settingsManager = new SettingsManager();
+    settingsManager.registerSwitchGroup($("input[name='settings-skin']"), "skin");
 
     $("#teaseurltb").change((e) => {
         checkAddTease();

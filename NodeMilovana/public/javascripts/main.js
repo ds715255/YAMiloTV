@@ -7,6 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var teaseManager;
+var settingsManager;
 class Tease {
     constructor(id) {
         this._id = id;
@@ -49,7 +50,7 @@ class Tease {
         target.append(node);
         var buttons = node.find("button");
         $(buttons[0]).click(() => {
-            location.href = `tease?id=${this._id}`;
+            location.href = `tease?id=${this._id}&skin=${settingsManager.get('skin')}`;
         });
         $(buttons[1]).css("display", "none");
         $(buttons[2]).click(() => {
@@ -124,6 +125,31 @@ class TeaseManager {
         window.localStorage.setItem("teases", JSON.stringify(this._teases));
     }
 }
+class SettingsManager {
+    registerSwitchGroup(inputs, name) {
+        var self = this;
+        inputs.change(function (e) {
+            self.saveSetting(name, $(e.target).val());
+        });
+        var defaultInput = inputs.filter("input[checked='checked']");
+        defaultInput = defaultInput.length == 0 ? $(inputs[0]) : defaultInput;
+        var storedValue = this.loadSetting(name, defaultInput.val());
+        inputs.filter(`input[value='${storedValue}']`).click();
+    }
+    get(name) {
+        return this.loadSetting(name, null);
+    }
+    saveSetting(name, value) {
+        window.localStorage.setItem(`setting-${name}`, JSON.stringify(value));
+    }
+    loadSetting(name, defaultValue) {
+        var result = window.localStorage.getItem(`setting-${name}`);
+        if (result == null) {
+            return defaultValue;
+        }
+        return JSON.parse(result);
+    }
+}
 function checkAddTease() {
     var value = $("#teaseurltb").val();
     var id = Tease.getIdFromUrl(value);
@@ -139,6 +165,8 @@ $(document).ready(function () {
     if (!iOS)
         $('.ios').remove();
     teaseManager = new TeaseManager($("#teases"));
+    settingsManager = new SettingsManager();
+    settingsManager.registerSwitchGroup($("input[name='settings-skin']"), "skin");
     $("#teaseurltb").change((e) => {
         checkAddTease();
     });

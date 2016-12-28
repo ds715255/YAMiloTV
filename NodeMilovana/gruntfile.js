@@ -22,7 +22,9 @@ module.exports = function (grunt) {
             target: {
                 files: {
                     'public/stylesheets/main.min.css': ['public/stylesheets/main.css'],
-                    'public/stylesheets/tease.min.css': ['public/stylesheets/tease.css']
+                    'public/stylesheets/tease.min.css': ['public/stylesheets/tease.css'],
+                    'public/stylesheets/tease.default.min.css': ['public/stylesheets/tease.default.css'],
+                    'public/stylesheets/tease.plain.min.css': ['public/stylesheets/tease.plain.css']
                 }
             }
         }

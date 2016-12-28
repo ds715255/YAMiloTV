@@ -1,0 +1,20 @@
+﻿button {
+    border-radius: 6px;
+    border: 2px solid #B85959;
+    background-color: #E89E9E;
+    cursor: pointer;
+    color: white;
+}
+
+button:hover {
+    background-color: #E3BFBF;
+}
+
+a {
+    color: #00B7FF;
+}
+
+.splitView {
+    border-left: 2px solid #B85959;
+    background-color: #F3E2E2;
+}

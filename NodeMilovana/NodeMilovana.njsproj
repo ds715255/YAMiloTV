@@ -83,6 +83,8 @@
     <Content Include="public\images\ustar.png" />
     <Content Include="public\stylesheets\main.css" />
     <Content Include="public\stylesheets\tease.css" />
+    <Content Include="public\stylesheets\tease.plain.css" />
+    <Content Include="public\stylesheets\tease.default.css" />
     <Content Include="README.md" />
     <Content Include="views\tease.pug" />
     <Content Include="views\index.pug" />

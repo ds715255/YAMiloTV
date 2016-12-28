@@ -1476,8 +1476,7 @@ class Buttons extends Command {
 class SplitView extends Command {
     constructor() {
         super();
-        this.node.css("border-left", "2px solid #B85959");
-        this.node.css("background-color","#F3E2E2");
+        this.node.addClass("splitView");
     }
 }
 

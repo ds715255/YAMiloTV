@@ -2,29 +2,11 @@
     height:100%;
 }
 
-
-button {
-    border-radius: 6px;
-    border: 2px solid #B85959;
-    background-color: #E89E9E;
-    cursor: pointer;
-    color: white;
-}
-
-    button:hover {
-        background-color: #E3BFBF;
-    }
-
 .full-screen {
     background: black;
     height: 100%;
     overflow: hidden;
 }
-
-a {
-    color: #00B7FF;
-}
-
 
 #tease {
     height: 100%;

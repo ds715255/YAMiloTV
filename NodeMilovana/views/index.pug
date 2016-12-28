@@ -21,5 +21,18 @@ block content
       div(style="margin-left:160px;display:block")
           h2 My Tease List
           table(id="teases")
+    div(class="block1", style="height:10px")
+    div(class="block2")
+      h2 Settings
+      p
+        b Skin
+        |&nbsp;- Sets the skin for the tease viewer.
+      div(class="switch-field")
+        input(type="radio", name="settings-skin", id="toggle-skin-default", value="default", checked="checked")
+        label(for="toggle-skin-default") Default
+        input(type="radio", name="settings-skin", id="toggle-skin-plain", value="plain")
+        label(for="toggle-skin-plain") Plain
+        
     div(class="block1")
       p Find the source code on <a href="https://github.com/ds715255/YAMiloTV">GitHub</a>.
+    

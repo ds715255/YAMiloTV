@@ -6,6 +6,7 @@
     <Name>NodeMilovana</Name>
     <RootNamespace>NodeMilovana</RootNamespace>
     <LaunchUrl>http://localhost:1337/?id=2699</LaunchUrl>
+    <ScriptArguments>debug</ScriptArguments>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -61,6 +62,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="gruntfile.js" />
+    <Compile Include="public\javascripts\inobounce.js" />
+    <Compile Include="public\javascripts\spark-md5.min.js" />
     <Compile Include="runapp.js" />
     <TypeScriptCompile Include="app.ts" />
     <TypeScriptCompile Include="public\javascripts\main.ts" />

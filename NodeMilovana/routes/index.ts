@@ -6,7 +6,7 @@ import express = require('express');
 const router = express.Router();
 
 router.get('/', (req: express.Request, res: express.Response) => {
-    res.render('index', { title: 'YAMiloTV' });
+    res.render('index', { title: 'YAMiloTV', debug: req.app.get('debug') });
 });
 
 export default router;

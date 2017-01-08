@@ -8,6 +8,9 @@ const meta_1 = require("./routes/meta");
 const medialocation_1 = require("./routes/medialocation");
 const vote_1 = require("./routes/vote");
 var app = express();
+if (process.argv.indexOf("debug") != -1) {
+    app.set('debug', true);
+}
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 app.use(express.static(path.join(__dirname, 'public')));

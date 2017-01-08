@@ -11,10 +11,12 @@
   },
   "main": "app.js",
   "dependencies": {
-    "debug": "^2.2.0",
+    "debug": "^2.6.0",
     "express": "^4.14.0",
     "pug": "^2.0.0-beta6",
-    "request": "^2.79.0"
+    "request": "^2.79.0",
+    "ts-md5": "^1.2.0",
+    "uglify-js": "github:mishoo/UglifyJS2#harmony"
   },
   "devDependencies": {
     "grunt": "^1.0.1",

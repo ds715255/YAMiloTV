@@ -10,6 +10,10 @@ import vote from './routes/vote';
 
 var app = express();
 
+if (process.argv.indexOf("debug")!=-1) {
+    app.set('debug', true);
+}
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');

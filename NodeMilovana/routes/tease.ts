@@ -13,7 +13,7 @@ router.get('/', (req: express.Request, res: express.Response) => {
             break;
     }
     skin = `/stylesheets/tease.${skin}.min.css`;
-    res.render('tease', { title: 'YAMiloTV - Web tease', skin: skin });
+    res.render('tease', { title: 'YAMiloTV - Web tease', skin: skin, debug: req.app.get('debug')  });
 });
 
 export default router;

@@ -1,4 +1,6 @@
-﻿var rating: Rating;
+﻿declare var SparkMD5: any;
+
+var rating: Rating;
 
 class Control {
     protected children: Array<Control> = Array()
@@ -30,11 +32,13 @@ class Control {
     set parent(value: Control) { this._parent= value; }
 
     private updateNode() {
+        this.node.css("box-sizing", "content-box"); // FIXME: workaround for misplaced buttons .. jquery calculated with a different sizing than the browser .. why?
         this.node.width(this.width);
         this.node.height(this.height);
         this.node.css("left", this.x);
         this.node.css("top", this.y);
         this.node.css("position", "absolute");
+        this.node.css("box-sizing", "");
     }
 
     render(target: JQuery) {
@@ -66,13 +70,19 @@ class Control {
     }
 }
 
+enum StateLoadResult {
+    Ok,
+    NoData,
+    VersionMismatch
+}
 
 class FlashTease extends Control {
-    _id: number;
-    _script: string;
-    _actionRegistry: Array<string>;
-    _currentClip: Command;
-    _renderTarget:JQuery
+    private _id: number;
+    private _script: string;
+    private _scriptHash: string;
+    private _actionRegistry: Array<string>;
+    private _currentClip: Command;
+    private _renderTarget:JQuery
 
     constructor(id: number, renderTarget: JQuery) {
         super();
@@ -82,8 +92,6 @@ class FlashTease extends Control {
             this.width = renderTarget.width();
             this.height = renderTarget.height();
             this._currentClip.setBounds(this.bounds);
-            /*this._renderTarget.children().remove();
-            this.render(this._renderTarget);*/
         });
 
         this._id = id;
@@ -94,12 +102,29 @@ class FlashTease extends Control {
 
     }
 
+    saveState() {
+        window.localStorage.setItem(`tease-${this._id}`, Pcm2Compat.serialize(this._scriptHash));
+    }
+
+    loadState(force:boolean): StateLoadResult {
+        var data = window.localStorage.getItem(`tease-${this._id}`);
+        if (!data || data == "") {
+            return StateLoadResult.NoData;
+        }
+        var result = Pcm2Compat.deserialize(this._scriptHash, data, force);
+        if (result == StateLoadResult.Ok) {
+            this.runAction(Pcm2Compat.getCurrentAction().toString(), false);
+        }
+        return result;
+    }
+
     private load() {
         return new Promise<string>((resolve, reject) =>
             jQuery.get("script?id=" + this._id,
-            (body) =>
+            (body,status, xhr) =>
             {
                console.log("downloaded script successfully");
+               this._scriptHash = SparkMD5.hash(body);
                this._script = body;
                resolve();               
                 
@@ -144,7 +169,7 @@ class FlashTease extends Control {
         this.runAction("start");
     }
 
-    runAction(actionString:string) {
+    runAction(actionString:string, countRun:boolean = true) {
         var action:any = null;
         var actionId: ActionString = null;
         var actionList: Array<string> = null;
@@ -161,13 +186,16 @@ class FlashTease extends Control {
         console.log("Running action " + actionId + "...");
 
         if (actionId.toString() == "exittease") {
+            window.localStorage.removeItem(`tease-${this._id}`);
             rating.show();
             return;
         }
 
         if (this._actionRegistry[actionId.toString()] != undefined) {
             action = this._actionRegistry[actionId.toString()];
-            Pcm2Compat.noteActionRun(actionId); 
+            if (countRun) {
+                Pcm2Compat.noteActionRun(actionId);
+            }
             MediaLoader.cacheAction(actionId);
             if (action.substr(0, 1) == "{") {
                 actionList = Parser.explodeWithParenthesis(";", action.substr(1));
@@ -203,10 +231,9 @@ class FlashTease extends Control {
         this._currentClip.setViewer(this);
         var inputVars: Array<string> = actionCommand.getInputVars();
         this.addChild(this._currentClip);
-        this._currentClip.initialize(inputVars, this.bounds);
-
-        
+        this._currentClip.initialize(inputVars, this.bounds);        
         this.render(this._renderTarget);
+        this.saveState();
     }
 
     private clearCurrentClip(): void {
@@ -378,16 +405,33 @@ class Settings {
     }
 }
 
+class MediaImage {
+    constructor(url: string) {
+        this.url = url;
+    }
+    url: string;
+    width: number;
+    height: number;
+}
+
+class Sound {
+    constructor(url: string) {
+        this.url = url;
+    }
+    url: string;
+    audio: HTMLAudioElement;
+}
+
 class MediaLoader {
     static _mediaList: Array<any> = new Array();
     static _execTree: Array<any> = new Array();
     static _queue: Array<any> = new Array();
     static _queueRunning: boolean = false;
     static _queueIdleTimer: number;
-    static _loadedImages: Array<string> = new Array();
-    static _loadedSounds: Array<string> = new Array();
+    static _loadedImages: Array<MediaImage> = new Array();
+    static _loadedSounds: Array<Sound> = new Array();
 
-    static showImage(url: string, onload:(url:string)=> void = null): string {        
+    static showImage(url: string, onload: (url: string) => void = null): MediaImage {        
         if (MediaLoader._loadedImages[url] != null) {
             console.log("Image " + url + " from cache...");
             var result = MediaLoader._loadedImages[url];
@@ -401,16 +445,16 @@ class MediaLoader {
             url = "medialocation?folder=" + Settings.get("mediaFolder") + "&id=" + url;
             
             $.get(url, realurl => {
-                MediaLoader._loadedImages[url] = realurl;
+                MediaLoader._loadedImages[url] = new MediaImage(realurl);
                 onload(realurl);
             });            
         }
         return null;
     }
 
-    static getSound(url: string, onload: (url: string) => void = null): string {
+    static getSound(url: string, onload: (url: string) => void = null): Sound {
         if (MediaLoader._loadedSounds[url] != null) {
-            console.log("Image " + url + " from cache...");
+            console.log("Sound " + url + " from cache...");
             var result = MediaLoader._loadedSounds[url];
             if (url.indexOf("*") > -1) {
                 delete MediaLoader._loadedSounds[url];
@@ -422,7 +466,7 @@ class MediaLoader {
             url = "medialocation?folder=" + Settings.get("mediaFolder") + "&id=" + url;
 
             $.get(url, realurl => {
-                MediaLoader._loadedSounds[url] = realurl;
+                MediaLoader._loadedSounds[url] = new Sound(realurl);
                 onload(realurl);
             });
         }
@@ -472,13 +516,17 @@ class MediaLoader {
         console.log("Preloading " + fullurl + "...");
 
         $.get(fullurl, realurl => {
-            var img = $("<img />");
-            img.load((e) => {
-                MediaLoader._loadedSounds[url] = realurl;
+            var sound = document.createElement("audio");
+            sound.autoplay = false;
+            sound.preload = "auto";
+            
+            sound.addEventListener("loadeddata", function(e) {
+                MediaLoader._loadedSounds[url] = new Sound(realurl);
+                MediaLoader._loadedSounds[url].audio = e.target;
                 MediaLoader.loadNextQueueItem();
             });
             // preload image
-            img.attr("src", realurl);
+            sound.src = realurl;
         });
                 
     }
@@ -493,13 +541,17 @@ class MediaLoader {
         console.log("Preloading " + fullurl + "...");
 
         $.get(fullurl, realurl => {
-            var img = $("<img />"); 
-            img.load((e) => {
-                MediaLoader._loadedImages[url] = realurl;
+            var img = document.createElement("img");
+            img.addEventListener("load", function(e) {                
+                var loadedimg = e.target as HTMLImageElement;
+                MediaLoader._loadedImages[url] = new MediaImage(realurl);
+                MediaLoader._loadedImages[url].width = loadedimg.width;
+                MediaLoader._loadedImages[url].height = loadedimg.height;
+
                 MediaLoader.loadNextQueueItem();
             });
             // preload image
-            img.attr("src", realurl);                
+            img.src = realurl;              
         });        
     }
 
@@ -579,6 +631,48 @@ class Pcm2Compat {
     private static _actionMustNot:Array<number> = new Array();
     private static _actionMust: Array<number> = new Array();
     private static _actionNumActionsFrom:Array<any> = new Array();
+    
+    static serialize(scriptHash:string): string {
+        var obj = {
+            version: 1,
+            hash: scriptHash,
+            actionSet: Pcm2Compat._actionSet,
+            currentAction: Pcm2Compat._currentAction.toString(),
+            actionRunCounter: Pcm2Compat._actionRunCounter,
+            actionFirstRun: Pcm2Compat._actionFirstRun,
+            actionLastRun: Pcm2Compat._actionLastRun,
+            actionRepeat: Pcm2Compat._actionRepeat,
+            actionNumActions: Pcm2Compat._actionNumActions,
+            actionMustNot: Pcm2Compat._actionMustNot,
+            actionMust: Pcm2Compat._actionMust,
+            actionNumActionsFrom: Pcm2Compat._actionNumActionsFrom
+        };
+        return JSON.stringify(obj);
+    }
+
+    static deserialize(scriptHash: string, json: string, force: boolean): StateLoadResult {
+        var data = JSON.parse(json);
+        if (data == null) {
+            return StateLoadResult.NoData;
+        }
+        if (!force && data.hash != scriptHash) {
+            return StateLoadResult.VersionMismatch;
+        }
+
+        Pcm2Compat._actionSet = data.actionSet;
+        Pcm2Compat._currentAction = new ActionString(data.currentAction);
+        Pcm2Compat._actionRunCounter = data.actionRunCounter;
+        Pcm2Compat._actionFirstRun = data.actionFirstRun;
+        Pcm2Compat._actionLastRun = data.actionLastRun;
+        Pcm2Compat._actionRepeat = data.actionRepeat;
+        Pcm2Compat._actionNumActions = data.actionNumActions;
+        Pcm2Compat._actionMustNot = data.actionMustNot;
+        Pcm2Compat._actionMust = data.actionMust;
+        Pcm2Compat._actionNumActionsFrom = data.actionNumActionsFrom;
+
+        return StateLoadResult.Ok;
+    }
+
 
     static setAction(actionId: ActionString) {
         if (Pcm2Compat._actionSet[actionId.toString()] == undefined) {
@@ -1155,7 +1249,7 @@ class TextView extends Command {
     initialize(inputVars, bounds) {
         super.initialize(inputVars, bounds);
 
-        this._textField = $('<p style="text-align:center;margin:0 5px;"></p>');
+        this._textField = $('<p></p>');
 
         var text = $(inputVars.text);
 
@@ -1173,9 +1267,7 @@ class TextView extends Command {
             );
         });
 
-        this._textField.html($('<div>').append(text).html());
-        this._textField.css("padding", "20 10");
-        this.node.css("overflow-y", "auto");
+        this._textField.html($('<div>').append(text).html());                     
         this.node.append(this._textField);
         this.setBounds(bounds);
     }    
@@ -1183,25 +1275,39 @@ class TextView extends Command {
 
 
 class Pic extends Command {
-    _img: JQuery;
+    private _img: JQuery;
+    private _imgwidth: number;
+    private _imgheight: number;
+
     initialize(inputVars, bounds) {
         super.initialize(inputVars, bounds);
         if (inputVars.id == undefined) {
             inputVars.id = "";
         }
 
-        var url = MediaLoader.showImage(inputVars.id, (url) => this.createImage(url));
-        if (url != null) {
-            this.createImage(url);
+        var image = MediaLoader.showImage(inputVars.id, (url) => this.createImage(url, 0, 0));
+        if (image != null) {
+            this.createImage(image.url, image.width, image.height);
         }
     }
 
-    private createImage(url:string) {
+    private createImage(url: string, width: number, height: number) {
 
-        this._img = $("<img />");
-        this._img.load(() => this.setBounds(this.bounds));
+        this._img = $("<img />");        
+        this._img.css("position", "absolute");
+        if (width != 0 || height != 0) {
+            this._imgwidth = width;
+            this._imgheight = height;
+            this.setBounds(this.bounds);
+        } else {
+            console.log("image was not preloaded");
+            this._img.load(() => {
+                this._imgwidth = this._img.width();
+                this._imgheight = this._img.height();
+                this.setBounds(this.bounds);
+            });
+        }
         this._img.attr("src", url);
-        this._img.css("position","absolute");
         this.node.append(this._img);
     }
 
@@ -1211,23 +1317,22 @@ class Pic extends Command {
             return;
         }
 
-        if (this._img.width() / this._img.height() > bounds.width / bounds.height) {
-            this._img.width(bounds.width);
-            this._img.css("left", bounds.x);
-            this._img.css("top", bounds.y + (bounds.height - this._img.height()) / 2);
-        }
-        else {
-            this._img.height(bounds.height);
-            this._img.css("top", bounds.y);
-            this._img.css("left", bounds.x + (bounds.width - this._img.width()) / 2);
-        }
+        let factor = Math.min(bounds.width / this._imgwidth, bounds.height / this._imgheight);
+        this._img.width(this._imgwidth * factor);
+        this._img.height(this._imgheight * factor);
+        this._img.css("left", (bounds.width - this._img.width()) / 2 + bounds.x);
+        this._img.css("top", (bounds.height - this._img.height()) / 2 + bounds.y);
     }
 }
 
 
 
 class SoundCommand extends InvisibleCommand {
-    
+    // audio playback on ios is not good - there's always a delay because
+    // that browser keeps buffering every time and you cannot preload anything
+    // as sounds are coming from a different server we cannot use newer audio apis too.
+    // looks like we are stuck with what we got now.
+
     _sound: HTMLAudioElement;
 
     initialize(inputVars, bounds) {
@@ -1237,9 +1342,11 @@ class SoundCommand extends InvisibleCommand {
         if (inputVars.loops == undefined) {
             inputVars.loops = 1;
         }
-        var url = MediaLoader.getSound(inputVars.id, (url) => this.createElement(url));
-        if (url != null) {
-            this.createElement(url);
+        var sound = MediaLoader.getSound(inputVars.id, (url) => this.createElement(url));
+        if (sound != null) {
+            this._sound = sound.audio;
+            this._sound.play();
+            this.node.append(this._sound);
         }
     }
 
@@ -1294,7 +1401,8 @@ class Button extends Control {
     constructor(text: string) {
         super();
         this.node = $("<button>" + text + "</button>");
-        this.node.css("position","absolute");
+        this.node.css("position", "absolute");
+        
     }
 
     addClickHandler(handler: (sender: Button) => void) {
@@ -1838,7 +1946,7 @@ function launchIntoFullscreen(element) {
 }
 
 
-async function runTease(id: number) {
+async function runTease(id: number, resume:number) {
     Settings.set("teaseId", id);
 
     $('#exit').click(() => {
@@ -1850,10 +1958,25 @@ async function runTease(id: number) {
     var tease = new FlashTease(id, $("#tease"));
     await tease.parse();
     $("#loading").hide();
-    tease.start();
+
+    if (resume == 1) {
+        var result = tease.loadState(false);
+        if (result == StateLoadResult.VersionMismatch) {
+            console.log("Version mismatch with saved data");
+            if (confirm("The tease was updated since your last visit.\nContinuing may result in strange behavior. Do you really want to load your saved state?")) {
+                result = tease.loadState(true);
+            }            
+        }
+        if (result != StateLoadResult.Ok) {
+            console.log("Failed to load state.");
+            tease.start();
+        }
+    } else {
+        tease.start();
+    }
 
 }
 
 //Settings.set("DEBUG", true);
-$().ready(() => runTease(Number(getQueryVariable("id"))));
+$().ready(() => runTease(Number(getQueryVariable("id")), Number(getQueryVariable("resume"))));
 

@@ -1,9 +1,17 @@
 ﻿extends layout
 
 block head
-  link(rel='stylesheet', href='/stylesheets/tease.min.css')
-  link(rel='stylesheet', href=skin)
-  script(src='/javascripts/flashtease.min.js')
+  if debug
+    link(rel='stylesheet', href='/stylesheets/tease.css')
+  else
+    link(rel='stylesheet', href='/stylesheets/tease.min.css')
+  link(rel='stylesheet', href=skin)  
+  script(src='/javascripts/spark-md5.min.js')  
+  script(src='/javascripts/inobounce.min.js')  
+  if debug
+    script(src='/javascripts/flashtease.js')
+  else
+    script(src='/javascripts/flashtease.min.js')
 
 block content  
     div(class='full-screen')    
@@ -12,6 +20,6 @@ block content
         button(id='exit',title='Exit tease') X
       div(id='loading')
         p Loading
-      div(id='rating')        
+      div(id='rating')
         
           

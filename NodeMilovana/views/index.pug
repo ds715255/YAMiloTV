@@ -1,7 +1,10 @@
 ﻿extends layout
 
 block head
-  script(src='/javascripts/main.min.js')
+  if debug
+    script(src='/javascripts/main.js')
+  else
+    script(src='/javascripts/main.min.js')
 
 block content
   div(class="introwrapper")

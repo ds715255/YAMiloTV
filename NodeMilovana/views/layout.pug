@@ -8,7 +8,10 @@ html
     link(rel="apple-touch-icon", href="images/icon152.png",sizes="152x152")
     link(rel="apple-touch-icon", href="images/icon120.png",sizes="120x120")
     link(rel="apple-touch-icon", href="images/icon76.png",sizes="76x76")
-    link(rel='stylesheet', href='/stylesheets/main.min.css')
+    if debug
+      link(rel='stylesheet', href='/stylesheets/main.css')
+    else
+      link(rel='stylesheet', href='/stylesheets/main.min.css')
     script(src='https://code.jquery.com/jquery-1.11.3.js')
     block head
   body

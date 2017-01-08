@@ -14,7 +14,8 @@ module.exports = function (grunt) {
             my_target: {
                 files: {
                     'public/javascripts/flashtease.min.js': ['public/javascripts/flashtease.js'],
-                    'public/javascripts/main.min.js': ['public/javascripts/main.js']
+                    'public/javascripts/main.min.js': ['public/javascripts/main.js'],
+                    'public/javascripts/inobounce.min.js': ['public/javascripts/inobounce.js']
                 }
             }
         },

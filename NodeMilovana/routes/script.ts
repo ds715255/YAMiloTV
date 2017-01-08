@@ -10,7 +10,7 @@ router.get('/', (req: express.Request, res: express.Response) => {
         (error, response, body) => {
             if (error) {
                 
-            } else {                                
+            } else {
                 res.send(body);
             }
         });       

@@ -17,6 +17,9 @@ class Tease {
         result._author = obj._author;
         result._title = obj._title;
         result._thumbnail = obj._thumbnail;
+        if (window.localStorage.getItem(`tease-${obj._id}`)) {
+            result._hasSaveState = true;
+        }
         return result;
     }
     static getIdFromUrl(text) {
@@ -50,9 +53,18 @@ class Tease {
         target.append(node);
         var buttons = node.find("button");
         $(buttons[0]).click(() => {
-            location.href = `tease?id=${this._id}&skin=${settingsManager.get('skin')}`;
+            if (!this._hasSaveState || confirm("Starting this tease will delete your saved state. Do you really want to start over?")) {
+                location.href = `tease?id=${this._id}&skin=${settingsManager.get('skin')}`;
+            }
         });
-        $(buttons[1]).css("display", "none");
+        if (this._hasSaveState) {
+            $(buttons[1]).click(() => {
+                location.href = `tease?id=${this._id}&skin=${settingsManager.get('skin')}&resume=1`;
+            });
+        }
+        else {
+            $(buttons[1]).css("display", "none");
+        }
         $(buttons[2]).click(() => {
             if (confirm(`Do you really want to delete the Tease '${this._title}'?`)) {
                 teaseManager.remove(this._id);
@@ -108,6 +120,7 @@ class TeaseManager {
     }
     remove(id) {
         this._teases = $.grep(this._teases, function (e) { return e.id != id; });
+        window.localStorage.removeItem(`tease-${id}`);
         this.save();
         this.render();
     }

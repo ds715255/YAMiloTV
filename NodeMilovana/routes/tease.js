@@ -9,7 +9,7 @@ router.get('/', (req, res) => {
             break;
     }
     skin = `/stylesheets/tease.${skin}.min.css`;
-    res.render('tease', { title: 'YAMiloTV - Web tease', skin: skin });
+    res.render('tease', { title: 'YAMiloTV - Web tease', skin: skin, debug: req.app.get('debug') });
 });
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = router;

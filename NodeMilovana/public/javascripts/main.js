@@ -3,7 +3,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
         function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments)).next());
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
 var teaseManager;
@@ -38,12 +38,7 @@ class Tease {
                 var metaArray = body.split("\n");
                 this._title = metaArray[1];
                 this._author = metaArray[2];
-                var pic;
-                var i = 3;
-                do {
-                    pic = metaArray[i++].split(':')[1];
-                } while (pic == "*.jpg");
-                this._thumbnail = `https://eu.media.milovana.com/timg/${metaArray[0]}/${this._id}/tb_s/${pic}`;
+                this._thumbnail = metaArray[3];
                 resolve(true);
             }));
         });
@@ -164,7 +159,7 @@ class SettingsManager {
     }
 }
 function checkAddTease() {
-    var value = $("#teaseurltb").val();
+    var value = $("#teaseurltb").val().toString();
     var id = Tease.getIdFromUrl(value);
     if (id == null) {
         $("#addtease").prop("disabled", true);
@@ -187,7 +182,7 @@ $(document).ready(function () {
         checkAddTease();
     });
     $("#addtease").click(() => __awaiter(this, void 0, void 0, function* () {
-        yield teaseManager.add(Tease.getIdFromUrl($("#teaseurltb").val()));
+        yield teaseManager.add(Tease.getIdFromUrl($("#teaseurltb").val().toString()));
         $("#teaseurltb").val("");
     }));
     checkAddTease();

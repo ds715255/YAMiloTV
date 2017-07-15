@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const express = require("express");
 const router = express.Router();
 router.get('/', (req, res) => {
@@ -11,6 +12,5 @@ router.get('/', (req, res) => {
     skin = `/stylesheets/tease.${skin}.min.css`;
     res.render('tease', { title: 'YAMiloTV - Web tease', skin: skin, debug: req.app.get('debug') });
 });
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = router;
 //# sourceMappingURL=tease.js.map

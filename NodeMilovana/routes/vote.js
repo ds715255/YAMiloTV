@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const express = require("express");
 const request = require("request");
 const router = express.Router();
@@ -17,6 +18,5 @@ router.get('/', (req, res) => {
         }
     });
 });
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = router;
 //# sourceMappingURL=vote.js.map

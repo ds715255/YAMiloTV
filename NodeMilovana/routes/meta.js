@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const express = require("express");
 const request = require("request");
 const router = express.Router();
@@ -9,6 +10,7 @@ router.get('/', (req, res) => {
         var authorId;
         var title;
         var author;
+        var thumbnail;
         while ((m = regex.exec(body)) !== null) {
             if (m.index === regex.lastIndex) {
                 regex.lastIndex++;
@@ -27,15 +29,31 @@ router.get('/', (req, res) => {
                 }
             });
         }
-        request.get("https://milovana.com/webteases/getscript.php?metainfo=1&id=" + req.query.id, (error, response, body) => {
-            if (error) {
+        request.get("https://milovana.com/webteases/#author=" + author + "&pp=50", (error, response, body) => {
+            if (!error) {
+                var tnregex = new RegExp("id=" + req.query.id + "\"><img src=\"(.+?)\"", "gm");
+                while ((m = tnregex.exec(body)) !== null) {
+                    if (m.index === tnregex.lastIndex) {
+                        tnregex.lastIndex++;
+                    }
+                    m.forEach((match, groupIndex) => {
+                        switch (groupIndex) {
+                            case 1:
+                                thumbnail = match;
+                                break;
+                        }
+                    });
+                }
             }
-            else {
-                res.send(authorId + "\n" + title + "\n" + author + "\n" + body);
-            }
+            request.get("https://milovana.com/webteases/getscript.php?metainfo=1&id=" + req.query.id, (error, response, body) => {
+                if (error) {
+                }
+                else {
+                    res.send(authorId + "\n" + title + "\n" + author + "\n" + thumbnail + "\n" + body);
+                }
+            });
         });
     });
 });
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = router;
 //# sourceMappingURL=meta.js.map

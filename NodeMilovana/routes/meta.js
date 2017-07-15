@@ -1,12 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const express = require("express");
-const request = require("request");
-const router = express.Router();
-router.get('/', (req, res) => {
-    request.get("https://milovana.com/webteases/showflash.php?id=" + req.query.id, (error, response, body) => {
-        const regex = /<div id="headerbar">\s*<div class="title">(.*?) by <a href="webteases\/#author=(\d+)" [^>]*>(.*?)<\/a><\/div>/gm;
-        let m;
+var express = require("express");
+var request = require("request");
+var router = express.Router();
+router.get('/', function (req, res) {
+    request.get("https://milovana.com/webteases/showflash.php?id=" + req.query.id, function (error, response, body) {
+        var regex = /<div id="headerbar">\s*<div class="title">(.*?) by <a href="webteases\/#author=(\d+)" [^>]*>(.*?)<\/a><\/div>/gm;
+        var m;
         var authorId;
         var title;
         var author;
@@ -15,7 +15,7 @@ router.get('/', (req, res) => {
             if (m.index === regex.lastIndex) {
                 regex.lastIndex++;
             }
-            m.forEach((match, groupIndex) => {
+            m.forEach(function (match, groupIndex) {
                 switch (groupIndex) {
                     case 1:
                         title = match;
@@ -29,14 +29,14 @@ router.get('/', (req, res) => {
                 }
             });
         }
-        request.get("https://milovana.com/webteases/list.php?author=" + author + "&pp=50", (error, response, body) => {
+        request.get("https://milovana.com/webteases/list.php?author=" + author + "&pp=50", function (error, response, body) {
             if (!error) {
                 var tnregex = new RegExp("id=" + req.query.id + "\"><img src=\"(.+?)\"", "gm");
                 while ((m = tnregex.exec(body)) !== null) {
                     if (m.index === tnregex.lastIndex) {
                         tnregex.lastIndex++;
                     }
-                    m.forEach((match, groupIndex) => {
+                    m.forEach(function (match, groupIndex) {
                         switch (groupIndex) {
                             case 1:
                                 thumbnail = match;
@@ -45,7 +45,7 @@ router.get('/', (req, res) => {
                     });
                 }
             }
-            request.get("https://milovana.com/webteases/getscript.php?metainfo=1&id=" + req.query.id, (error, response, body) => {
+            request.get("https://milovana.com/webteases/getscript.php?metainfo=1&id=" + req.query.id, function (error, response, body) {
                 if (error) {
                 }
                 else {

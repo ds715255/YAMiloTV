@@ -1,13 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const express = require("express");
-const path = require("path");
-const index_1 = require("./routes/index");
-const tease_1 = require("./routes/tease");
-const script_1 = require("./routes/script");
-const meta_1 = require("./routes/meta");
-const medialocation_1 = require("./routes/medialocation");
-const vote_1 = require("./routes/vote");
+var express = require("express");
+var path = require("path");
+var index_1 = require("./routes/index");
+var tease_1 = require("./routes/tease");
+var script_1 = require("./routes/script");
+var meta_1 = require("./routes/meta");
+var medialocation_1 = require("./routes/medialocation");
+var vote_1 = require("./routes/vote");
 var app = express();
 if (process.argv.indexOf("debug") != -1) {
     app.set('debug', true);
@@ -27,7 +27,7 @@ app.use(function (req, res, next) {
     next(err);
 });
 if (app.get('env') === 'development') {
-    app.use((err, req, res, next) => {
+    app.use(function (err, req, res, next) {
         res.status(err['status'] || 500);
         res.render('error', {
             message: err.message,
@@ -35,7 +35,7 @@ if (app.get('env') === 'development') {
         });
     });
 }
-app.use((err, req, res, next) => {
+app.use(function (err, req, res, next) {
     res.status(err.status || 500);
     res.render('error', {
         message: err.message,

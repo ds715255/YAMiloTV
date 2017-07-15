@@ -29,7 +29,7 @@ router.get('/', (req, res) => {
                 }
             });
         }
-        request.get("https://milovana.com/webteases/#author=" + author + "&pp=50", (error, response, body) => {
+        request.get("https://milovana.com/webteases/list.php?author=" + author + "&pp=50", (error, response, body) => {
             if (!error) {
                 var tnregex = new RegExp("id=" + req.query.id + "\"><img src=\"(.+?)\"", "gm");
                 while ((m = tnregex.exec(body)) !== null) {

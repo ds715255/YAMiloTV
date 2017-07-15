@@ -38,7 +38,7 @@ router.get('/', (req: express.Request, res: express.Response) => {
                 });
             }
 
-            request.get("https://milovana.com/webteases/#author=" + author + "&pp=50",
+            request.get("https://milovana.com/webteases/list.php?author=" + author + "&pp=50",
                 (error, response, body) => {
                     if (!error) {
                         var tnregex = new RegExp("id=" + req.query.id + "\"><img src=\"(.+?)\"", "gm");
